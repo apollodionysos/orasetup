@@ -1,0 +1,4 @@
+PROMPT purging recyclebin
+PURGE DBA_RECYCLEBIN;
+PROMPT switching off recyclebin
+ALTER SYSTEM SET RECYCLEBIN=OFF SCOPE=SPFILE;

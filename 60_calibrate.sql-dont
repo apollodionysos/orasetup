@@ -1,0 +1,35 @@
+-- calibrate IO
+COLUMN calibration_time FORMAT A16
+SELECT status, to_char(calibration_time,'YYYY-MM-DD HH24:MI') AS calibration_time 
+  FROM v$io_calibration_status;
+
+SET SERVEROUTPUT ON
+DECLARE
+  lat  INTEGER;
+  iops INTEGER;
+  mbps INTEGER;
+BEGIN
+  DBMS_RESOURCE_MANAGER.CALIBRATE_IO (
+     num_physical_disks  => 1,
+     max_latency         => 20,
+     max_iops            => iops,
+     max_mbps            => mbps,
+     actual_latency      => lat);
+  --DBMS_OUTPUT.PUT_LINE('max_iops = ' || iops);
+  --DBMS_OUTPUT.PUT_LINE('max_mbps = ' || mbps);
+  --DBMS_OUTPUT.PUT_LINE('latency  = '  || lat);
+END;
+/
+
+COLUMN calibration_time FORMAT A16
+SELECT status, to_char(calibration_time,'YYYY-MM-DD HH24:MI') AS calibration_time 
+  FROM v$io_calibration_status;
+
+SET LINE 100
+COLUMN operation  FORMAT A30
+COLUMN start_time FORMAT A16
+COLUMN end_time   FORMAT A16
+SELECT to_char(start_time,'YYYY-MM-DD HH24:MI') as start_time,
+       to_char(  end_time,'YYYY-MM-DD HH24:MI') as end_time,
+	   max_iops, max_mbps, max_pmbps, latency, num_physical_disks
+  FROM dba_rsrc_io_calibrate;
