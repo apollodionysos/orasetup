@@ -3,13 +3,17 @@
 # 1) create common user C##EXAMPLEDBA in CDB$ROOT
 # 2) create normal user EXAMPLE and dba user EXAMPLEDBA in first PDB
 # 2) create directory ORAPUMP in /opt/oracle/orapump
-# modify user_name and password to your liking
 
+
+# modify user_name and password to your liking, careful, it will be logged in the output
+# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 # example, normal user
 user_name="example"
 
 # password
-password="correcthorsebatterystaple"
+password="oracle"
+# ∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧
+
 
 # exampledba, with DBA role
 dba_name="${user_name}dba"
@@ -23,8 +27,8 @@ mkdir -p /opt/oracle/orapump
 
 # create users
 sqlplus -s / as sysdba << EOF
-PROMPT create common user ${common_name} in CDB$ROOT
-CREATE USER ${common_name} IDENTIFIED BY ${user_name} CONTAINER=ALL;
+PROMPT create common user ${common_name} ${password} in CDB$ROOT
+CREATE USER ${common_name} IDENTIFIED BY "${password}" CONTAINER=ALL;
 GRANT CREATE SESSION, DBA TO ${common_name} CONTAINER=ALL;
 
 PROMPT switch to PDB ${ORACLE_PDB}
@@ -33,14 +37,14 @@ ALTER SESSION SET CONTAINER=${ORACLE_PDB};
 PROMPT create directory object for orapump
 CREATE OR REPLACE DIRECTORY orapump AS '/opt/oracle/orapump'; 
 
-PROMPT create normal user ${user_name}
-CREATE USER ${user_name} IDENTIFIED BY ${user_name} 
+PROMPT create normal user ${user_name}  ${password}
+CREATE USER ${user_name} IDENTIFIED BY "${password}" 
   DEFAULT TABLESPACE users QUOTA UNLIMITED ON users;
 GRANT CREATE SESSION, RESOURCE, SELECT_CATALOG_ROLE, SELECT ANY TABLE TO ${user_name};
 GRANT READ, WRITE, EXECUTE ON DIRECTORY orapump TO ${user_name};
 
-PROMPT create dba user ${dba_name}
-CREATE USER ${dba_name} IDENTIFIED BY ${user_name} 
+PROMPT create dba user ${dba_name}  ${password}
+CREATE USER ${dba_name} IDENTIFIED BY "${password}" 
   DEFAULT TABLESPACE users QUOTA UNLIMITED ON users;
 GRANT CREATE SESSION, DBA TO ${dba_name};
 GRANT READ, WRITE, EXECUTE ON DIRECTORY orapump TO ${dba_name};
